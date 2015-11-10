@@ -3,10 +3,11 @@ $country = filter_var($_GET['country'], FILTER_SANITIZE_STRING);
 $city = filter_var($_GET['city'], FILTER_SANITIZE_STRING);
 $start = filter_var($_GET['datetimepicker'], FILTER_SANITIZE_STRING);
 $endDate = filter_var($_GET['datetimepicker1'], FILTER_SANITIZE_STRING);
+$order = filter_var($_GET['order'], FILTER_SANITIZE_STRING);
 $events = [];
-if(!isset( $_GET['country'], $_GET['city'], $_GET['datetimepicker'], $_GET['datetimepicker1']))
+if(!isset( $_GET['country'], $_GET['city'], $_GET['datetimepicker'], $_GET['datetimepicker1'], $_GET['order'] ))
 {
-    $message = 'both parameters are required';
+    $message = 'All the parameters are required';
 }
 else{
     try{
@@ -22,13 +23,14 @@ else{
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         /*** preparing the statement ***/
-        $stmt = $dbh->prepare("SELECT title, description, startDate, category, venueName, url, img FROM event WHERE country = :country AND  city = :city AND startDate BETWEEN :start AND :endDate ORDER BY startDate ASC");
+        $stmt = $dbh->prepare("SELECT title, description, startDate, category, venueName, url, img, latitude, longitude FROM event WHERE country = :country AND  city = :city AND startDate BETWEEN :start AND :endDate ORDER BY " . $order);
 
         /*** binding the parameters ***/
         $stmt->bindParam(':country', $country, PDO::PARAM_STR);
         $stmt->bindParam(':city', $city, PDO::PARAM_STR);
         $stmt->bindParam(':start', $start, PDO::PARAM_STR);
         $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+        //$stmt->bindParam(':orderq', $order, PDO::PARAM_STR);
         /*** executing the prepared statement ***/
         $stmt->execute();
 
@@ -113,19 +115,24 @@ else{
                 <div id="date">
                     <h2 class="text-success">Select a range of dates:</h2>
                     <div class="form-group">
+                        <label for="datetimepicker">From:</label>
                         <input class="form-control" id="datetimepicker" name="datetimepicker" type="text" value="<?php echo $start ?>">
                     </div>
                     <div class="form-group">
+                        <label for="datetimepicker1">To:</label>
                         <input class="form-control" id="datetimepicker1" name="datetimepicker1" type="text" value="<?php echo $endDate ?>">
                     </div>
+                    <label for="order">Sort by:</label>
+                    <select class="form-control" id="order" name="order">
+                        <option value="<?php echo $order?>"><?php echo $order?></option>
+                        <option value="startDate ASC">date (low to high)</option>
+                        <option value="startDate DESC">date (high to low)</option>
+                        <option value="title ASC">title (A - Z)</option>
+                        <option value="title DESC">title (Z - A)</option>
+                    </select>
                     <button type="submit" id="submit" class="btn btn-success">Search</button>
                 </div>
             </form>
-            <!--
-            <form action="index.html">
-                <button type="submit" id="reset" class="btn btn-danger hidden">Reset</button>
-            </form>
-            -->
         </div>
         <div class="col-md-1"></div>
     </div>
@@ -134,18 +141,6 @@ else{
         <div class="col-md-10">
             <p id="message" class="text-danger"></p>
         </div>
-        <div class="col-md-1"></div>
-    </div>
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-10" id="eventsContainer">
-
-        </div>
-        <div class="col-md-1"></div>
-    </div>
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-10" id="map"></div>
         <div class="col-md-1"></div>
     </div>
     <div class="row">
@@ -189,13 +184,113 @@ else{
         </div>
         <div class="col-md-1"></div>
     </div>
-
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10" id="map"></div>
+        <div class="col-md-1"></div>
+    </div>
 </div>
+<script src="https://maps.googleapis.com/maps/api/js?callback=start" async defer></script>
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="js/jquery-1.10.2.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="js/bootstrap.min.js"></script>
-<script src="js/start.js"></script>
+<script src="js/dateValidation.js"></script>
+<script>
+    /*Sorry for the inline script!*/
+    function Map() {
+        var map = null;
+        var markerBounds = new google.maps.LatLngBounds();
+        // Create a map object centered with latitude and longitude and specify the DOM element for display.
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                scrollwheel: true
+            });
+            var element = document.getElementById("map");
+            element.style.height = window.innerHeight - 150 + "px";
+        }; //End of initMap()
+
+        // Create a marker with a name and set its position.
+        function createMarker(latitude, longitude, name) {
+            var latlng = new google.maps.LatLng(latitude, longitude);
+            var marker = new google.maps.Marker({
+                map: map,
+                position: latlng,
+                title: name
+            });
+            markerBounds.extend(latlng);
+            return marker;
+        };
+
+        function createInfoWindow(text) {
+            var infowindow = new google.maps.InfoWindow({ content: text });
+            return infowindow;
+        };
+
+        function attachInfoWindow(marker, infowindow) {
+            marker.addListener('click', function () {
+                infowindow.open(map, marker);
+            });
+        };
+
+        function fitTheMap() {
+            map.fitBounds(markerBounds);
+            map.setCenter(markerBounds.getCenter());
+        };
+
+        //Revealing module of the class Map
+        return {
+            initMap: initMap,
+            createMarker: createMarker,
+            createInfoWindow: createInfoWindow,
+            attachInfoWindow: attachInfoWindow,
+            fitTheMap: fitTheMap
+        };
+
+    }
+    function start(){
+
+    var map = new Map();
+    map.initMap();
+        var markers;
+        var infowindows;
+    <?php
+
+     for($i = 0; $i < count($events); $i++)
+            {
+                 $title = $events[$i]['title'];
+                $description = $events[$i]['description'];
+                $date = $events[$i]['startDate'];
+                $img = $events[$i]['img'];
+                $url = $events[$i]['url'];
+                $category = $events[$i]['category'];
+               $element = '<div class="row jumbotron">' .
+                    '<div class="col-md-4">' .
+                    '<h2>'. $category . '</h2>' .
+                    '<h3 class="secondHeading"> <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> ' . $date . '</h3>' .
+                    '<img class="img-responsive" style="width: 100%" data-src="http://assets.sk-static.com/assets/default_images/thumb/default-artist-ba18a04.png" src="' . $img . '" alt="'. $title .'"/>' .
+                    '</div>'.
+                    '<div class="col-md-8">' .
+                    '<h2 class="firstHeading text-info">'. $title .'</h2>' .
+                    '<div class="bodyContent">' .
+                    '<p>' .
+                    $title .
+                    '</p>' .
+                    '<br> <a class="btn btn-success" href="' . $url . '" target="_blank">' .
+                    'Read More</a> ' .
+                    '</div>' .
+                    '</div>' .
+                    '</div>' ;
+              echo "var marker = map.createMarker(" . $events[$i]['latitude'] . " ,"  . $events[$i]['longitude'] . " , '"  . $events[$i]['title'] . "');\n";
+              echo "var infoWindow = map.createInfoWindow('". $element ."');\n";
+              echo "map.attachInfoWindow(marker, infoWindow);\n";
+            }
+
+     ?>
+        map.fitTheMap();
+    }
+</script>
+
 <!--DateTime picker plugin-->
 <link rel="stylesheet" type="text/css" href="js/plugins/datetimepicker/jquery.datetimepicker.css"/ >
 <script src="js/plugins/datetimepicker/jquery.js"></script>

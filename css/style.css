@@ -17,3 +17,7 @@ html, body {
 content{
     background-color: green;
 }
+
+.gm-style img {
+    max-width: 100%;
+}

@@ -17,7 +17,7 @@ var app = app || {};
         // Create a marker with a name and set its position.
         function createMarker(latitude, longitude, name, source) {
             var latlng = new google.maps.LatLng(latitude, longitude);
-            var image;
+            //var image;
             /*if(source === "songkick"){
                 image = 'images/songkick.png';
             }

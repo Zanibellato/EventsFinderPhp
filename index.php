@@ -52,7 +52,7 @@ catch(Exception $e)
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -105,6 +105,7 @@ catch(Exception $e)
                 <div class="col-md-10">
                     <form action="sendRequests.php" method="GET" class="form-inline" id="searchForm" onsubmit="return validateDate()">
                         <div id="location">
+                            <h2 class="text-success">Select a country and a city</h2>
                             <div class="form-group">
                                 <select class="form-control" id="country" name="country">
                                     <option value="">-- Select the country --</option>
@@ -128,11 +129,20 @@ catch(Exception $e)
                         <div id="date">
                             <h2 class="text-success">Select a range of dates:</h2>
                             <div class="form-group">
+                                <label for="datetimepicker">From:</label>
                                 <input class="form-control" id="datetimepicker" name="datetimepicker" type="text" placeholder="start">
                             </div>
                             <div class="form-group">
+                                <label for="datetimepicker1">To:</label>
                                 <input class="form-control" id="datetimepicker1" name="datetimepicker1" type="text" placeholder="end">
                             </div>
+                            <label for="order">Sort by:</label>
+                            <select class="form-control" id="order" name="order">
+                                <option value="startDate ASC">date (low to high)</option>
+                                <option value="startDate DESC">date (high to low)</option>
+                                <option value="title ASC">title (A - Z)</option>
+                                <option value="title DESC">title (Z - A)</option>
+                            </select>
                             <button type="submit" id="submit" class="btn btn-success">Search</button>
                         </div>
                     </form>
@@ -180,20 +190,21 @@ catch(Exception $e)
         <script src="js/eventbrite.js"></script>
         <script src="js/combiner.js"></script>
         <script src="js/start.js"></script>
+        <script src="js/dateValidation.js"></script>
+        <!--Google maps API OAuth script-->
+        <script src="https://maps.googleapis.com/maps/api/js?callback=start" async defer></script>
         <!--DateTime picker plugin-->
         <link rel="stylesheet" type="text/css" href="js/plugins/datetimepicker/jquery.datetimepicker.css"/ >
         <script src="js/plugins/datetimepicker/jquery.js"></script>
         <script src="js/plugins/datetimepicker/build/jquery.datetimepicker.full.min.js"></script>
         <script>
             jQuery('#datetimepicker').datetimepicker({
-              format:'Y.m.d H:i'
+                format:'Y.m.d H:i'
             });
 
             jQuery('#datetimepicker1').datetimepicker({
                 format:'Y.m.d H:i'
             });
         </script>
-        <!--Google maps API OAuth script-->
-        <script src="https://maps.googleapis.com/maps/api/js?callback=start" async defer></script>
     </body>
 </html>

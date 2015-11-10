@@ -156,7 +156,7 @@ var app = app || {};
                                 '<div class="col-md-4">' +  
                                     '<h3 class="secondHEading"> <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span> ' + event.startDate + 
                                     '<br><span class="glyphicon glyphicon-time" aria-hidden="true"></span> ' + time + '</h3>' + 
-                                    '<img class="img-responsive" data-src="http://assets.sk-static.com/assets/default_images/thumb/default-artist-ba18a04.png" src="' + event.img+ '" alt="'+ event.title+'"/>' +
+                                    '<img class="img-responsive" style="width: 100%; data-src="http://assets.sk-static.com/assets/default_images/thumb/default-artist-ba18a04.png" src="' + event.img+ '" alt="'+ event.title+'"/>' +
                                 '</div>'+
                                 '<div class="col-md-8">' +
                                     '<h2 class="firstHeading text-info">'+event.title+'</h2>' +
