@@ -23,7 +23,7 @@ var app = app || {};
                 //console.log(res);
                 if (res.events.length) {
                     res.events.forEach(function(ev, i , arr){
-                        console.log(ev);
+                        //console.log(ev);
                         var date = ev.start.local.split("T");
                         if(ev.venue){ //Only events with a venue in the specified day
                             var element = new app.Event();

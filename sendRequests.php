@@ -43,7 +43,7 @@ else{
             $message = "something wrong";
         }
         else{
-            $message = "List of the events for " . $city . " (" . $country . ")";
+            $message = "List of the events for " . $city . " (" . $country . ") || scroll for the map";
         }
 
     }
@@ -131,6 +131,9 @@ else{
                         <option value="title DESC">title (Z - A)</option>
                     </select>
                     <button type="submit" id="submit" class="btn btn-success">Search</button>
+                    <br>
+                    <br>
+                    <a href="#map" class="btn btn-info">Map</a>
                 </div>
             </form>
         </div>
@@ -146,7 +149,7 @@ else{
     <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-10">
-            <h2 class="text-primary"><?php echo $message; ?></h2>
+            <h2 class="text-primary"><?php echo $message; ?></h2><br>
             <?php
 
             for($i = 0; $i < count($events); $i++)

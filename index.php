@@ -144,13 +144,11 @@ catch(Exception $e)
                                 <option value="title DESC">title (Z - A)</option>
                             </select>
                             <button type="submit" id="submit" class="btn btn-success">Search</button>
+                            <br>
+                            <br>
+                            <a href="#map" class="btn btn-info">Map</a>
                         </div>
                     </form>
-                    <!--
-                    <form action="index.html">
-                        <button type="submit" id="reset" class="btn btn-danger hidden">Reset</button>
-                    </form>
-                    -->
                 </div>
                 <div class="col-md-1"></div>
             </div>
@@ -164,8 +162,7 @@ catch(Exception $e)
             <div class="row">
                 <div class="col-md-1"></div>
                 <div class="col-md-10" id="eventsContainer">
-                    <h2 id="title" class="text-primary">Unordered list of events:</h2>
-                    
+                    <h2 id="title" class="text-primary">Unordered list of events</h2><br>
                 </div>
                 <div class="col-md-1"></div>
             </div>
